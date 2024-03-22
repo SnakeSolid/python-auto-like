@@ -5,20 +5,26 @@
     const ui = document.createElement("div");
     ui.id = "autolike-controls";
     ui.innerHTML = `
-		<div class="row">
-		    <input type="checkbox" id="autolike">
-		    <label for="autolike">Auto like</label>
-	    </div>
+      <div class="row">
+        <label for="probability">∄</label>
+        <meter id="probability" min="0" low="30" high="70" max="100" optimum="100" value="50"></meter>
+        <label for="probability">∀</label>
+      </div>
 
-	    <div class="row">
-		    <button id="dislike" title="Dislike">⊖</button>
-		    <button id="like" title="Like">⊕</button>
-	    </div>
+      <div class="row">
+        <input type="checkbox" id="autolike">
+        <label for="autolike">Auto like</label>
+      </div>
 
-		<div class="row">
-		    <div id="message">&hellip;</message>
-	    </div>
-		`;
+      <div class="row">
+        <button id="dislike" title="Dislike">⊖</button>
+        <button id="like" title="Like">⊕</button>
+      </div>
+
+      <div class="row">
+        <div id="message">&hellip;</message>
+      </div>
+  	`;
 
     const body = document.getElementsByTagName("body")[0];
     body.appendChild(ui);
@@ -30,6 +36,7 @@
     autoskip: [],
     autowait: [],
   };
+  const probability = document.getElementById("probability");
   const autolike = document.getElementById("autolike");
   const like = document.getElementById("like");
   const dislike = document.getElementById("dislike");
@@ -51,7 +58,7 @@
     let found = false;
     let wait = false;
 
-    execute(context.autoskip, element => {
+    execute(context.autoskip, (element) => {
       element.click();
       found = true;
     });
@@ -157,9 +164,12 @@
     }
   });
 
-  socket.on("message", async (data, callback) => {
+  socket.on("prediction", async (data) => {
+    probability.innerText = 100.0 * data.value;
+  });
+
+  socket.on("message", async (data) => {
     message.innerText = data.message;
-    callback();
   });
 
   like.addEventListener("click", (event) => {

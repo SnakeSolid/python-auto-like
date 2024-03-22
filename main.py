@@ -3,11 +3,32 @@ from database import Database, Profile
 from flask import Flask, jsonify, request
 from flask import render_template
 from flask_socketio import SocketIO, send, emit, call
+from model import Model
+from train import analyze_photos
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 database = Database(DATABASE_PATH)
+model = Model()
 context = {}
+
+
+def to_integer(text):
+    if text == None:
+        return None
+
+    digits = "".join([ch for ch in text if ch >= "0" and ch <= "9"])
+
+    if len(digits) == 0:
+        return None
+
+    return int(digits)
+
+
+def analyze(profile_id):
+    photos = database.select_profile_photos(profile_id)
+
+    return analyze_photos(model, photos)
 
 
 @app.route("/")
@@ -23,18 +44,6 @@ def handle_connect():
 @socketio.on("disconnect")
 def handle_disconnect():
     print("Disconnected: {}".format(request.sid))
-
-
-def to_integer(text):
-    if text == None:
-        return None
-
-    digits = "".join([ch for ch in text if ch >= "0" and ch <= "9"])
-
-    if len(digits) == 0:
-        return None
-
-    return int(digits)
 
 
 @socketio.on("initialize")
@@ -67,6 +76,9 @@ def handle_initialize(data):
 def handle_recognize(data):
     domain = data["domain"]
     autolike = data["autolike"]
+
+    emit("message", {"message": "parsing..."})
+
     name = call("text", {"name": "name"})
     age = to_integer(call("text", {"name": "age"}))
     description = call("text", {"name": "description"})
@@ -86,7 +98,12 @@ def handle_recognize(data):
     profile_id = database.save_profile(profile)
     context[request.sid] = profile_id
 
-    call("message", {"message": "done"})
+    emit("message", {"message": "analyzing..."})
+
+    like_probability = analyze(profile_id)
+
+    emit("prediction", {"value": like_probability})
+    emit("message", {"message": "done"})
 
 
 @socketio.on("like")
@@ -96,7 +113,7 @@ def handle_like(data):
         database.set_like(profile_id)
 
         call("click", {"name": "like"})
-        call("message", {"message": "like"})
+        emit("message", {"message": "like"})
         emit("start", {})
 
 
@@ -107,7 +124,7 @@ def handle_dislike(data):
         database.set_dislike(profile_id)
 
         call("click", {"name": "dislike"})
-        call("message", {"message": "dislike"})
+        emit("message", {"message": "dislike"})
         emit("start", {})
 
 

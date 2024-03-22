@@ -8,9 +8,7 @@ import cv2
 import keras
 import numpy as np
 import tensorflow as tf
-
-# serialized = np.array(embedding).tobytes().hex()
-# embedding = np.frombuffer(bytes.fromhex(serialized))
+from model import Model
 
 DATA_X_PATH = join(DATABASE_ROOT, "X.npy")
 DATA_Y_PATH = join(DATABASE_ROOT, "y.npy")
@@ -21,7 +19,7 @@ ACTIONS = ["age", "gender", "race"]
 Face = namedtuple("Face", ["index", "age", "confidence", "gender", "race"])
 
 
-def analyze_photo(image):
+def _analyze_photo(image):
     image_height, image_width = image.shape[0], image.shape[1]
     faces = DeepFace.analyze(img_path=image,
                              enforce_detection=False,
@@ -53,7 +51,7 @@ def analyze_photo(image):
                 face["dominant_gender"], face["dominant_race"])
 
 
-def represent_photo(image, face):
+def _represent_photo(image, face):
     faces = DeepFace.represent(img_path=image,
                                enforce_detection=False,
                                model_name=MODEL,
@@ -68,15 +66,13 @@ def represent_photo(image, face):
     return np.array(embedding)
 
 
-def create_dataset():
+def _create_dataset(photos):
     if isfile(DATA_X_PATH) and isfile(DATA_Y_PATH):
         X = np.load(DATA_X_PATH)
         y = np.load(DATA_Y_PATH)
 
         return (X, y)
 
-    database = Database(DATABASE_PATH)
-    photos = database.all_photos()
     n_photos = len(photos)
     X = []
     y = []
@@ -95,12 +91,12 @@ def create_dataset():
         if image is None:
             continue
 
-        face = analyze_photo(image)
+        face = _analyze_photo(image)
 
         if face is None:
             continue
 
-        embedding = represent_photo(image, face)
+        embedding = _represent_photo(image, face)
         label = 1 if mark == "like" else 0
 
         if embedding is None:
@@ -118,17 +114,39 @@ def create_dataset():
     return (X, y)
 
 
+def analyze_photos(model, photos):
+    X = []
+
+    for (index, (_, _, path, _)) in enumerate(photos):
+        image_path = join(DATABASE_ROOT, path)
+        image = cv2.imread(image_path)
+
+        if image is None:
+            continue
+
+        face = _analyze_photo(image)
+
+        if face is None:
+            continue
+
+        embedding = _represent_photo(image, face)
+
+        if embedding is None:
+            continue
+
+        X.append(embedding)
+
+    X = np.array(X)
+    y = model.predict(X)
+    logit = np.sum(y)
+
+    print(np.exp(logit) / (1 + np.exp(logit)))
+
+
 if __name__ == "__main__":
-    X, y = create_dataset()
-    model = keras.Sequential()
-    model.add(layers.Dense(128, activation="relu"))
-    model.add(layers.Dense(32, activation="relu"))
-    model.add(layers.Dense(1))
-    model.compile(
-        optimizer=keras.optimizers.RMSprop(),
-        loss=keras.losses.BinaryCrossentropy(),
-        metrics=[keras.metrics.BinaryAccuracy()],
-    )
-    model.fit(X, y, batch_size=64, epochs=50, validation_data=(X, y))
-    model.save_weights(MODEL_PATH)
-    model.load_weights(MODEL_PATH)
+    database = Database(DATABASE_PATH)
+    photos = database.all_photos()
+    X, y = _create_dataset(photos)
+    model = Model()
+    model.train(X, y)
+    model.save()

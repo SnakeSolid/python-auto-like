@@ -44,6 +44,10 @@ SELECT_PHOTO = """
 SELECT id, profile, path, mark FROM photo WHERE id = ?
 """
 
+SELECT_PROFILE_PHOTOS = """
+SELECT id, profile, path, mark FROM photo WHERE profile = ?
+"""
+
 SELECT_PHOTOS = """
 SELECT id, profile, path, mark FROM photo
 """
@@ -144,6 +148,15 @@ class Database:
         else:
             return None
 
+    def select_profile_photos(self, profile_id):
+        result = []
+
+        for row in self.connection.execute(SELECT_PROFILE_PHOTOS,
+                                           (profile_id, )).fetchall():
+            result.append(PhotoData(row[0], row[1], row[2], row[3]))
+
+        return result
+
     def select_photo(self, photo_id):
         row = self.connection.execute(SELECT_PHOTO, (photo_id, )).fetchone()
 
@@ -174,7 +187,8 @@ class Database:
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
         photo_id = sha3_256(data).hexdigest()
-        (file_path, full_path) = path_for(DATABASE_ROOT, PHOTO_DIR, photo_id, extension)
+        (file_path, full_path) = path_for(DATABASE_ROOT, PHOTO_DIR, photo_id,
+                                          extension)
 
         with open(full_path, "wb") as handle:
             handle.write(data)
@@ -190,7 +204,8 @@ class Database:
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
         video_id = sha3_256(data).hexdigest()
-        (file_path, full_path) = path_for(DATABASE_ROOT, VIDEO_DIR, video_id, extension)
+        (file_path, full_path) = path_for(DATABASE_ROOT, VIDEO_DIR, video_id,
+                                          extension)
 
         with open(full_path, "wb") as handle:
             handle.write(data)

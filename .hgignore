@@ -3,7 +3,7 @@ syntax: glob
 __pycache__
 database/*.npy
 database/*.sqlite
-database/model.ckpt
+database/model
 database/photos
 database/videos
 node_modules
