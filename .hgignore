@@ -1,7 +1,9 @@
 syntax: glob
 *.log
 __pycache__
+database/*.npy
 database/*.sqlite
+database/model.ckpt
 database/photos
 database/videos
 node_modules

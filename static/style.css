@@ -43,25 +43,25 @@
 }
 
 #dislike {
-  background: #99f !important;
-}
-
-#dislike:hover {
-  background: #aaf !important;
-}
-
-#dislike:active {
-  background: #88d !important;
-}
-
-#like {
   background: #f99 !important;
 }
 
-#like:hover {
+#dislike:hover {
   background: #faa !important;
 }
 
-#like:active {
+#dislike:active {
   background: #d88 !important;
+}
+
+#like {
+  background: #9f9 !important;
+}
+
+#like:hover {
+  background: #afa !important;
+}
+
+#like:active {
+  background: #8d8 !important;
 }

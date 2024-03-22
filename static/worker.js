@@ -51,7 +51,7 @@
     let found = false;
     let wait = false;
 
-    execute(context.autoskip, () => {
+    execute(context.autoskip, element => {
       element.click();
       found = true;
     });

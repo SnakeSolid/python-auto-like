@@ -1,8 +1,8 @@
+from config import DATABASE_PATH
+from database import Database, Profile
 from flask import Flask, jsonify, request
 from flask import render_template
 from flask_socketio import SocketIO, send, emit, call
-from db import Database, Profile
-from config import DATABASE_PATH
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")

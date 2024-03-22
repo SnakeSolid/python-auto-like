@@ -1,5 +1,5 @@
 from collections import namedtuple
-from config import PHOTO_DIR, VIDEO_DIR
+from config import PHOTO_DIR, VIDEO_DIR, DATABASE_ROOT
 from hashlib import sha3_256
 from os import makedirs
 from os.path import join
@@ -53,11 +53,14 @@ SELECT id, profile, path FROM video WHERE id = ?
 """
 
 
-def path_for(base, hash, extension):
-    directory = join(base, hash[0], hash[1])
+def path_for(base, part, hash, extension):
+    directory = join(base, part, hash[0], hash[1])
+    file_path = join(part, hash[0], hash[1], hash + extension)
+    full_path = join(directory, hash + extension)
+
     makedirs(directory, exist_ok=True)
 
-    return join(directory, hash + extension)
+    return file_path, full_path
 
 
 PhotoData = namedtuple("PhotoData", ["id", "profile", "path", "mark"])
@@ -171,12 +174,12 @@ class Database:
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
         photo_id = sha3_256(data).hexdigest()
-        path = path_for(PHOTO_DIR, photo_id, extension)
+        (file_path, full_path) = path_for(DATABASE_ROOT, PHOTO_DIR, photo_id, extension)
 
-        with open(join(DATABASE_ROOT, path), "wb") as handle:
+        with open(full_path, "wb") as handle:
             handle.write(data)
 
-        self.connection.execute(INSERT_PHOTO, (photo_id, path, "none"))
+        self.connection.execute(INSERT_PHOTO, (photo_id, file_path, "none"))
         self.connection.commit()
 
         return photo_id
@@ -187,12 +190,12 @@ class Database:
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
         video_id = sha3_256(data).hexdigest()
-        path = path_for(VIDEO_DIR, video_id, extension)
+        (file_path, full_path) = path_for(DATABASE_ROOT, VIDEO_DIR, video_id, extension)
 
-        with open(join(DATABASE_ROOT, path), "wb") as handle:
+        with open(full_path, "wb") as handle:
             handle.write(data)
 
-        self.connection.execute(INSERT_VIDEO, (video_id, path))
+        self.connection.execute(INSERT_VIDEO, (video_id, file_path))
         self.connection.commit()
 
         return photo_id
