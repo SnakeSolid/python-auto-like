@@ -1,0 +1,4 @@
+deepface
+Flask
+Flask-SocketIO
+tensorflow==2.12

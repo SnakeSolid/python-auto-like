@@ -1,0 +1,8 @@
+syntax: glob
+*.log
+__pycache__
+database/*.sqlite
+database/photos
+database/videos
+node_modules
+venv

@@ -1,0 +1,34 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Quickstart &#8212; Flask Documentation (3.0.x)</title>
+    <link href="/static/style.css" rel="stylesheet" />
+    <script src="https://cdn.socket.io/socket.io-3.0.5.min.js"></script>
+  </head>
+  <body>
+    <div id="text">Empty</div>
+
+    <div id="autolike-controls">
+      <input type="checkbox" id="autolike" />
+      <label for="autolike">Auto like</label>
+
+      <button id="dislike" title="Dislike">⊖</button>
+      <button id="prev" title="Previous photo">≺</button>
+      <button id="next" title="Next photo">≻</button>
+      <button id="like" title="Like">⊕</button>
+    </div>
+
+    <script type="text/javascript">
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port,
+      );
+      socket.on("response", (data) => {
+        document.getElementById("text").innerHTML +=
+          "<p>" + JSON.stringify(data) + "</p>";
+      });
+      socket.emit("some_event", { data: "Hello, Server!" });
+    </script>
+  </body>
+</html>

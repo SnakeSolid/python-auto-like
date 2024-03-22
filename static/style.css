@@ -1,0 +1,67 @@
+#autolike-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  row-gap: 4px;
+  position: fixed;
+  top: 48px;
+  left: 8px;
+  border-radius: 4px;
+  border: 2px solid #444;
+  background: #eee;
+  margin: 4px;
+  padding: 8px;
+  z-index: 7;
+}
+
+#autolike-controls .row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  column-gap: 4px;
+}
+
+#autolike-controls button {
+  width: 48px;
+  border-radius: 4px;
+  border: 1px solid #888;
+  color: #000;
+  font-family: monospace;
+  font-size: 24px;
+}
+
+#autolike-controls button {
+  background: #bbb;
+}
+
+#autolike-controls button:hover {
+  background: #ccc;
+}
+
+#autolike-controls button:active {
+  background: #aaa;
+}
+
+#dislike {
+  background: #99f !important;
+}
+
+#dislike:hover {
+  background: #aaf !important;
+}
+
+#dislike:active {
+  background: #88d !important;
+}
+
+#like {
+  background: #f99 !important;
+}
+
+#like:hover {
+  background: #faa !important;
+}
+
+#like:active {
+  background: #d88 !important;
+}
