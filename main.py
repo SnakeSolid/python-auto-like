@@ -54,10 +54,10 @@ def handle_initialize(data):
         # yapf: disable
         call("set", { "name": "name", "value": "div:has(> div[data-name=voting-photo]) div[data-name=item-title-name]" })
         call("set", { "name": "age", "value": "div:has(> div[data-name=voting-photo]) span[data-name=item-title-age]" })
-        call("set", { "name": "photo", "value": "div[data-name=voting-photo] > img" })
+        call("set", { "name": "description", "value": "div:has(> div[data-name=voting-photo]) > div > div:has(div[data-name=item-title-name])" })
         call("set", { "name": "prev", "value": "div[data-name=voting-photo] div[data-name=arrow-left]" })
         call("set", { "name": "next", "value": "div[data-name=voting-photo] div[data-name=arrow-right]" })
-        call("set", { "name": "description", "value": "div:has(> div[data-name=voting-photo]) > div > div:has(div[data-name=item-title-name])" })
+        call("set", { "name": "photo", "value": "div[data-name=voting-photo] > img" })
         call("set", { "name": "like", "value": "div[data-name=voting-photo] button[data-name=like-action]" })
         call("set", { "name": "dislike", "value": "div[data-name=voting-photo] button[data-name=dislike-action]" })
         call("autoskip", { "value": "div[data-name=notice-featured-rating] button:not([data-name=featured-photos-text])" })
@@ -65,9 +65,23 @@ def handle_initialize(data):
         call("autoskip", { "value": "a[data-name=close-action]" })
         call("autowait", { "value": "div[data-name=uninotice-title-limit-voting]" })
         # yapf: enable
+    elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
+        # yapf: disable
+        call("set", { "name": "name", "value": "div.UserFullInfo__main-header-name > div > span:nth-child(1)" })
+        call("set", { "name": "age", "value": "div.UserFullInfo__main-header-name > div > span:nth-child(2)" })
+        call("set", { "name": "description", "value": "div.UserFullInfo.UserFullInfo--vkcom" })
+        call("set", { "name": "prev", "value": "div[data-testid=current-card] div[data-testid=prev-story-switcher]" })
+        call("set", { "name": "next", "value": "div[data-testid=current-card] div[data-testid=next-story-switcher]" })
+        call("set", { "name": "photos", "value": "div[data-testid=current-card] div > img" })
+        call("set", { "name": "videos", "value": "div[data-testid=current-card] div > video > source" })
+        call("set", { "name": "like", "value": "div[data-testid=current-card] div[role=button][data-testid=like]" })
+        call("set", { "name": "dislike", "value": "div[data-testid=current-card] div[role=button][data-testid=dislike]" })
+        call("autoskip", { "value": "div.CustomCardDesktopAside div.vkuiPlaceholder__action button.vkuiButton.vkuiButton--mode-tertiary" })
+        call("autowait", { "value": "div.GetProductAbstractPanelDesktop" })
+        # yapf: enable
     else:
         raise Exception(
-            "Connetion from unsupported domain `{}`.".format(domain))
+            "Connection from unsupported domain `{}`.".format(domain))
 
     emit("start", {})
 
@@ -75,26 +89,44 @@ def handle_initialize(data):
 @socketio.on("recognize")
 def handle_recognize(data):
     domain = data["domain"]
-    autolike = data["autolike"]
 
     emit("message", {"message": "parsing..."})
 
-    name = call("text", {"name": "name"})
-    age = to_integer(call("text", {"name": "age"}))
-    description = call("text", {"name": "description"})
-    images = []
+    if domain == "www.mamba.ru":
+        name = call("text", {"name": "name"})
+        age = to_integer(call("text", {"name": "age"}))
+        description = call("text", {"name": "description"})
+        photos = []
 
-    while call("click", {"name": "prev"}):
-        pass
+        while call("click", {"name": "prev"}):
+            pass
 
-    while True:
-        image = call("attribute", {"name": "photo", "attribute": "src"})
-        images.append(image)
+        while True:
+            photo = call("attribute", {"name": "photo", "attribute": "src"})
+            photos.append(image)
 
-        if not call("click", {"name": "next"}):
-            break
+            if not call("click", {"name": "next"}):
+                break
 
-    profile = Profile(domain, name, age, description, images)
+        profile = Profile(domain, name, age, description, photos)
+    elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
+        name = call("text", {"name": "name"})
+        age = to_integer(call("text", {"name": "age"}))
+        description = call("text", {"name": "description"})
+        photos = [
+            uri for uri in call("attributes", {
+                "name": "photos",
+                "attribute": "src"
+            }) if uri is not None
+        ]
+        videos = [
+            uri for uri in call("attributes", {
+                "name": "videos",
+                "attribute": "src"
+            }) if uri is not None
+        ]
+        profile = Profile(domain, name, age, description, photos, videos)
+
     profile_id = database.save_profile(profile)
     context[request.sid] = profile_id
 

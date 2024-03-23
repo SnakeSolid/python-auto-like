@@ -73,13 +73,10 @@
     } else if (wait) {
       message.innerText = "waiting...";
 
-      setTimeout(update, 5 * 60);
+      setTimeout(update, 10 * 60);
     } else if (context.recognize) {
       context.recognize = false;
-      socket.emit("recognize", {
-        domain: document.domain,
-        autolike: autolike.checked,
-      });
+      socket.emit("recognize", { domain: document.domain });
     }
   }
 
@@ -96,21 +93,21 @@
     message.innerText = "set(`" + data.name + "`, `" + data.value + "`)";
     context.selectors[data.name] = data.value;
 
-    callback();
+    await callback();
   });
 
   socket.on("autoskip", async (data, callback) => {
     message.innerText = "autoskip(`" + data.value + "`)";
     context.autoskip.push(data.value);
 
-    callback();
+    await callback();
   });
 
   socket.on("autowait", async (data, callback) => {
     message.innerText = "autowait(`" + data.value + "`)";
     context.autowait.push(data.value);
 
-    callback();
+    await callback();
   });
 
   socket.on("count", async (data, callback) => {
@@ -119,7 +116,7 @@
     const selector = context.selectors[data.name];
     const elements = document.querySelectorAll(selector);
 
-    callback(elements.length);
+    await callback(elements.length);
   });
 
   socket.on("text", async (data, callback) => {
@@ -129,9 +126,9 @@
     const element = document.querySelector(selector);
 
     if (element != null) {
-      callback(element.innerText);
+      await callback(element.innerText);
     } else {
-      callback("");
+      await callback("");
     }
   });
 
@@ -143,10 +140,21 @@
     const element = document.querySelector(selector);
 
     if (element != null) {
-      callback(element[data.attribute]);
+      await callback(element[data.attribute]);
     } else {
-      callback(null);
+      await callback(null);
     }
+  });
+
+  socket.on("attributes", async (data, callback) => {
+    message.innerText =
+      "attributes(`" + data.name + "`, `" + data.attribute + "`)";
+
+    const selector = context.selectors[data.name];
+    const elements = document.querySelectorAll(selector);
+    const result = Array.from(elements, (element) => element[data.attribute]);
+
+    await callback(result);
   });
 
   socket.on("click", async (data, callback) => {
@@ -156,11 +164,11 @@
     const element = document.querySelector(selector);
 
     if (element != null) {
-      element.click();
+      element.dispatchEvent(new Event("click", { bubbles: true }));
 
-      callback(true);
+      await callback(true);
     } else {
-      callback(false);
+      await callback(false);
     }
   });
 
