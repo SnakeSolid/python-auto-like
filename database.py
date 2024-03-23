@@ -91,12 +91,18 @@ class Database:
         video_ids = []
 
         for photo in profile.photos:
-            photo_id = self.save_photo(photo)
-            photo_ids.append(photo_id)
+            try:
+                photo_id = self.save_photo(photo)
+                photo_ids.append(photo_id)
+            except:
+                print('Failed to save photo `{}`'.format(photo))
 
         for video in profile.videos:
-            video_id = self.save_video(video)
-            video_ids.append(video_id)
+            try:
+                video_id = self.save_video(video)
+                video_ids.append(video_id)
+            except:
+                print('Failed to save video `{}`'.format(video))
 
         profile_id = self._find_profile(photo_ids, video_ids)
 

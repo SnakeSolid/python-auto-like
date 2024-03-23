@@ -67,11 +67,11 @@
     });
 
     if (found) {
-      message.innerText = "Auto skip";
+      message.innerText = "auto skip";
 
       setTimeout(update, 500);
     } else if (wait) {
-      message.innerText = "Waiting...";
+      message.innerText = "waiting...";
 
       setTimeout(update, 5 * 60);
     } else if (context.recognize) {
@@ -165,7 +165,7 @@
   });
 
   socket.on("prediction", async (data) => {
-    probability.innerText = 100.0 * data.value;
+    probability.value = 100.0 * data.value;
   });
 
   socket.on("message", async (data) => {

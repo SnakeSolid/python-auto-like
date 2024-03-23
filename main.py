@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from flask import render_template
 from flask_socketio import SocketIO, send, emit, call
 from model import Model
-from train import analyze_photos
+from photo import analyze_photos
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
