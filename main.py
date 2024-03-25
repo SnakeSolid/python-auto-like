@@ -103,7 +103,7 @@ def handle_recognize(data):
 
         while True:
             photo = call("attribute", {"name": "photo", "attribute": "src"})
-            photos.append(image)
+            photos.append(photo)
 
             if not call("click", {"name": "next"}):
                 break

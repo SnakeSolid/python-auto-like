@@ -5,7 +5,7 @@ from os.path import join
 import cv2
 import numpy as np
 
-BACKEND = "yunet"
+BACKEND = "mtcnn"
 MODEL = "Facenet512"
 ACTIONS = ["age", "gender", "race"]
 
@@ -19,10 +19,10 @@ def analyze_photo(image):
                              actions=ACTIONS,
                              detector_backend=BACKEND,
                              silent=True)
+    face = [ face for face in faces if face["face_confidence"] > 0 ]
     n_faces = len(faces)
 
-    # If face not found, return None
-    if n_faces == 0 or (n_faces == 1 and faces[0]["face_confidence"] == 0):
+    if n_faces == 0:
         return None
 
     face_index = 0
