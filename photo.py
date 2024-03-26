@@ -19,7 +19,7 @@ def analyze_photo(image):
                              actions=ACTIONS,
                              detector_backend=BACKEND,
                              silent=True)
-    face = [ face for face in faces if face["face_confidence"] > 0 ]
+    face = [face for face in faces if face["face_confidence"] > 0]
     n_faces = len(faces)
 
     if n_faces == 0:
