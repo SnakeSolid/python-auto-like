@@ -4,7 +4,7 @@ import sqlite3
 
 connection = sqlite3.connect("database/database.sqlite")
 
-for backend in [ "ssd", "mtcnn", "yunet" ]: # "opencv",
+for backend in ["ssd", "mtcnn", "yunet"]:  # "opencv",
     for (path, ) in connection.execute("select path from photo"):
         image = join("database", path)
 
@@ -17,7 +17,10 @@ for backend in [ "ssd", "mtcnn", "yunet" ]: # "opencv",
         except ValueError:
             continue
 
-        faces = [ face for face in faces if face["face_confidence"] > 0 ]
-        faces = [ "{}={}".format(face["dominant_gender"], face["age"]) for face in faces ]
+        faces = [face for face in faces if face["face_confidence"] > 0]
+        faces = [
+            "{}={}".format(face["dominant_gender"], face["age"])
+            for face in faces
+        ]
 
         print("{};{};{};{}".format(backend, path, len(faces), ",".join(faces)))

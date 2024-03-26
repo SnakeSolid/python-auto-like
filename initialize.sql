@@ -23,3 +23,9 @@ CREATE TABLE IF NOT EXISTS video (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS video_id ON video (id);
 CREATE UNIQUE INDEX IF NOT EXISTS video_profile_id ON video (profile, id);
+
+CREATE TABLE IF NOT EXISTS photo_embedding (
+    id TEXT NOT NULL,
+    embedding BLOB NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS photo_embedding_id ON photo_embedding (id);

@@ -59,10 +59,6 @@ def represent_photo(image, face):
     return np.array(embedding)
 
 
-def _from_logit(logit):
-    return np.exp(logit) / (1 + np.exp(logit))
-
-
 def analyze_photos(model, photos):
     X = []
 
@@ -90,5 +86,6 @@ def analyze_photos(model, photos):
 
     X = np.array(X)
     y = model.predict(X)
+    y = np.sum(y)
 
-    return _from_logit(np.sum(y))
+    return float((np.exp(y) / (1 + np.exp(y))))

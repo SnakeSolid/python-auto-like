@@ -92,10 +92,11 @@ def handle_recognize(data):
 
     emit("message", {"message": "parsing..."})
 
+    name = call("text", {"name": "name"})
+    age = to_integer(call("text", {"name": "age"}))
+    description = call("text", {"name": "description"})
+
     if domain == "www.mamba.ru":
-        name = call("text", {"name": "name"})
-        age = to_integer(call("text", {"name": "age"}))
-        description = call("text", {"name": "description"})
         photos = []
 
         while call("click", {"name": "prev"}):
@@ -110,9 +111,6 @@ def handle_recognize(data):
 
         profile = Profile(domain, name, age, description, photos)
     elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
-        name = call("text", {"name": "name"})
-        age = to_integer(call("text", {"name": "age"}))
-        description = call("text", {"name": "description"})
         photos = [
             uri for uri in call("attributes", {
                 "name": "photos",

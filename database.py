@@ -106,7 +106,7 @@ class Database:
 
         profile_id = self._find_profile(photo_ids, video_ids)
 
-        if profile_id == None:
+        if profile_id is None:
             profile_id = str(uuid4())
 
         self.connection.execute(INSERT_PROFILE,
@@ -150,7 +150,7 @@ class Database:
                 ids.add(data.profile)
 
         if len(ids) == 1:
-            return sorted(ids)[0]
+            return list(ids)[0]
         else:
             return None
 
@@ -178,14 +178,6 @@ class Database:
             return VideoData(row[0], row[1], row[2])
         else:
             return None
-
-    def set_photo_profile(self, photo_id, profile_id):
-        self.connection.execute(SET_PHOTO_PROFILE, (photo_id, profile_id))
-        self.connection.commit()
-
-    def set_video_profile(self, video_id, profile_id):
-        self.connection.execute(SET_VIDEO_PROFILE, (video_id, profile_id))
-        self.connection.commit()
 
     def save_photo(self, photo):
         response = urllib.request.urlopen(photo)
@@ -219,7 +211,7 @@ class Database:
         self.connection.execute(INSERT_VIDEO, (video_id, file_path))
         self.connection.commit()
 
-        return photo_id
+        return video_id
 
 
 class Profile:
