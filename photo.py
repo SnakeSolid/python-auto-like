@@ -86,6 +86,6 @@ def analyze_photos(model, photos):
 
     X = np.array(X)
     y = model.predict(X)
-    y = np.sum(y)
+    m = np.median(y)
 
-    return float((np.exp(y) / (1 + np.exp(y))))
+    return float((np.exp(m) / (1 + np.exp(m))))

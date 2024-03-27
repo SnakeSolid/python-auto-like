@@ -1,3 +1,4 @@
+from collections import namedtuple
 from config import DATABASE_PATH
 from database import Database, Profile
 from flask import Flask, jsonify, request
@@ -11,6 +12,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 database = Database(DATABASE_PATH)
 model = Model()
 context = {}
+
+AnalyzeResult = namedtuple("AnalyzeResult", ["probability", "manual"])
 
 
 def to_integer(text):
@@ -27,8 +30,22 @@ def to_integer(text):
 
 def analyze(profile_id):
     photos = database.select_profile_photos(profile_id)
+    marks = set()
 
-    return analyze_photos(model, photos)
+    for (_, _, _, mark) in photos:
+        marks.add(mark)
+
+    if len(marks) == 1:
+        mark = list(marks)[0]
+
+        if mark == "like":
+            return AnalyzeResult(1.0, True)
+        elif mark == "dislike":
+            return AnalyzeResult(0.0, True)
+
+    probability = analyze_photos(model, photos)
+
+    return AnalyzeResult(probability, False)
 
 
 @app.route("/")
@@ -130,10 +147,17 @@ def handle_recognize(data):
 
     emit("message", {"message": "analyzing..."})
 
-    like_probability = analyze(profile_id)
+    result = analyze(profile_id)
 
-    emit("prediction", {"value": like_probability})
-    emit("message", {"message": "done"})
+    emit("prediction", {"probability": result.probability})
+
+    if result.manual:
+        if result.probability >= 0.5:
+            emit("message", {"message": "manual like"})
+        else:
+            emit("message", {"message": "manual dislike"})
+    else:
+        emit("message", {"message": "done"})
 
 
 @socketio.on("like")

@@ -173,7 +173,7 @@
   });
 
   socket.on("prediction", async (data) => {
-    probability.value = 100.0 * data.value;
+    probability.value = 100.0 * data.probability;
   });
 
   socket.on("message", async (data) => {
