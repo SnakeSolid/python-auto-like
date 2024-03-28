@@ -4,6 +4,7 @@ from deepface import DeepFace
 from os.path import join
 import cv2
 import numpy as np
+import pickle
 
 BACKEND = "mtcnn"
 MODEL = "Facenet512"
@@ -12,7 +13,13 @@ ACTIONS = ["age", "gender", "race"]
 Face = namedtuple("Face", ["index", "age", "confidence", "gender", "race"])
 
 
-def analyze_photo(image):
+def analyze_photo(image_id, path):
+    image_path = join(DATABASE_ROOT, path)
+    image = cv2.imread(image_path)
+
+    if image is None:
+        return (None, None)
+
     image_height, image_width = image.shape[0], image.shape[1]
     faces = DeepFace.analyze(img_path=image,
                              enforce_detection=False,
@@ -23,7 +30,7 @@ def analyze_photo(image):
     n_faces = len(faces)
 
     if n_faces == 0:
-        return None
+        return (None, None)
 
     face_index = 0
     face_delta = image_height**2 + image_width**2
@@ -39,45 +46,38 @@ def analyze_photo(image):
             face_delta = delta
 
     face = faces[face_index]
-
-    return Face(face_index, face["age"], face["face_confidence"],
+    face = Face(face_index, face["age"], face["face_confidence"],
                 face["dominant_gender"], face["dominant_race"])
-
-
-def represent_photo(image, face):
     faces = DeepFace.represent(img_path=image,
                                enforce_detection=False,
                                model_name=MODEL,
                                detector_backend=BACKEND)
-    index = face.index
 
-    if len(faces) <= index:
-        return None
+    if len(faces) <= face_index:
+        return (None, None)
 
-    embedding = faces[index]["embedding"]
+    embedding = faces[face_index]["embedding"]
 
-    return np.array(embedding)
+    return (face, np.array(embedding))
 
 
-def analyze_photos(model, photos):
+def analyze_photos(model, photos, database):
     X = []
 
-    for (index, (_, _, path, _)) in enumerate(photos):
-        image_path = join(DATABASE_ROOT, path)
-        image = cv2.imread(image_path)
-
-        if image is None:
-            continue
-
-        face = analyze_photo(image)
-
-        if face is None:
-            continue
-
-        embedding = represent_photo(image, face)
+    for (index, (photo_id, _, path, _)) in enumerate(photos):
+        embedding = database.select_photo_embedding(photo_id)
 
         if embedding is None:
-            continue
+            (face, embedding) = analyze_photo(photo_id, path)
+
+            if face is None:
+                continue
+
+            print(face)
+
+            database.insert_photo_embedding(photo_id, pickle.dumps(embedding))
+        else:
+            embedding = pickle.loads(embedding)
 
         X.append(embedding)
 

@@ -56,6 +56,16 @@ SELECT_VIDEO = """
 SELECT id, profile, path FROM video WHERE id = ?
 """
 
+SELECT_PHOTO_EMBEDDING = """
+SELECT id, embedding FROM photo_embedding WHERE id = ?
+"""
+
+INSERT_PHOTO_EMBEDDING = """
+INSERT INTO photo_embedding (id, embedding)
+VALUES (?, ?)
+ON CONFLICT DO NOTHING
+"""
+
 
 def path_for(base, part, hash, extension):
     directory = join(base, part, hash[0], hash[1])
@@ -78,6 +88,19 @@ class Database:
 
         self.connection = sqlite3.connect(path, check_same_thread=False)
         self.connection.executescript(init_script)
+        self.connection.commit()
+
+    def select_photo_embedding(self, photo_id):
+        row = self.connection.execute(SELECT_PHOTO_EMBEDDING,
+                                      (photo_id, )).fetchone()
+
+        if row is not None:
+            return row[0]
+        else:
+            return None
+
+    def insert_photo_embedding(self, photo_id, embedding):
+        self.connection.execute(INSERT_PHOTO_EMBEDDING, (photo_id, embedding))
         self.connection.commit()
 
     def all_photos(self):

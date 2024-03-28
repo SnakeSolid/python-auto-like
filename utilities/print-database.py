@@ -11,6 +11,10 @@ if __name__ == "__main__":
           connection.execute("select count(*) from photo").fetchone()[0])
     print("N videos:",
           connection.execute("select count(*) from video").fetchone()[0])
+    print(
+        "N photo embeddings:",
+        connection.execute("select count(*) from photo_embedding").fetchone()
+        [0])
     print()
 
     for (mark, count) in connection.execute(
@@ -34,4 +38,10 @@ if __name__ == "__main__":
     print("-- videos --")
 
     for row in connection.execute("select * from video").fetchall():
+        print(row)
+
+    print()
+    print("-- photo embeddings --")
+
+    for row in connection.execute("select * from photo_embedding").fetchall():
         print(row)

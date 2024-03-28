@@ -43,7 +43,7 @@ def analyze(profile_id):
         elif mark == "dislike":
             return AnalyzeResult(0.0, True)
 
-    probability = analyze_photos(model, photos)
+    probability = analyze_photos(model, photos, database)
 
     return AnalyzeResult(probability, False)
 
