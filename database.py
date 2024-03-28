@@ -57,7 +57,7 @@ SELECT id, profile, path FROM video WHERE id = ?
 """
 
 SELECT_PHOTO_EMBEDDING = """
-SELECT id, embedding FROM photo_embedding WHERE id = ?
+SELECT embedding FROM photo_embedding WHERE id = ?
 """
 
 INSERT_PHOTO_EMBEDDING = """
