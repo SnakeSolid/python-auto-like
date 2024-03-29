@@ -13,7 +13,8 @@ database = Database(DATABASE_PATH)
 model = Model()
 context = {}
 
-AnalyzeResult = namedtuple("AnalyzeResult", ["probability", "manual"])
+AnalyzeResult = namedtuple("AnalyzeResult",
+                           ["probability", "age", "gender", "race", "manual"])
 
 
 def to_integer(text):
@@ -39,13 +40,14 @@ def analyze(profile_id):
         mark = list(marks)[0]
 
         if mark == "like":
-            return AnalyzeResult(1.0, True)
+            return AnalyzeResult(1.0, None, None, None, True)
         elif mark == "dislike":
-            return AnalyzeResult(0.0, True)
+            return AnalyzeResult(0.0, None, None, None, True)
 
-    probability = analyze_photos(model, photos, database)
+    result = analyze_photos(model, photos, database)
 
-    return AnalyzeResult(probability, False)
+    return AnalyzeResult(result.probability, result.age, result.gender,
+                         result.race, False)
 
 
 @app.route("/")
@@ -149,7 +151,13 @@ def handle_recognize(data):
 
     result = analyze(profile_id)
 
-    emit("prediction", {"probability": result.probability})
+    emit(
+        "prediction", {
+            "probability": result.probability,
+            "age": result.age,
+            "gender": result.gender,
+            "race": result.race
+        })
 
     if result.manual:
         if result.probability >= 0.5:

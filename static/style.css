@@ -21,7 +21,12 @@
   column-gap: 4px;
 }
 
+#autolike-controls #probability {
+  flex-grow: 1;
+}
+
 #autolike-controls button {
+  flex-grow: 1;
   width: 48px;
   border-radius: 4px;
   border: 1px solid #888;

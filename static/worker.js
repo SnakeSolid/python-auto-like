@@ -12,12 +12,22 @@
       </div>
 
       <div class="row">
+        Age: <span id="age">&mdash;</span>,
+        Gender: <span id="gender">&mdash;</span>
+      </div>
+
+      <div class="row">
+        Race: <span id="race">&mdash;</span>
+      </div>
+
+      <div class="row">
         <input type="checkbox" id="autolike">
         <label for="autolike">Auto like</label>
       </div>
 
       <div class="row">
         <button id="dislike" title="Dislike">⊖</button>
+        <button id="analyze" title="Analyze">≋</button>
         <button id="like" title="Like">⊕</button>
       </div>
 
@@ -37,8 +47,12 @@
     autowait: [],
   };
   const probability = document.getElementById("probability");
+  const age = document.getElementById("age");
+  const gender = document.getElementById("gender");
+  const race = document.getElementById("race");
   const autolike = document.getElementById("autolike");
   const like = document.getElementById("like");
+  const analyze = document.getElementById("analyze");
   const dislike = document.getElementById("dislike");
   const message = document.getElementById("message");
   const uri = "http://127.0.0.1:5000";
@@ -174,6 +188,23 @@
 
   socket.on("prediction", async (data) => {
     probability.value = 100.0 * data.probability;
+    age.innerText = data.age || "\u2014";
+
+    if (data.gender == null) {
+      gender.innerText = "\u2014";
+    } else if (data.gender == "woman") {
+      gender.innerText = "\u2640";
+    } else if (data.gender == "man") {
+      gender.innerText = "\u2642";
+    } else {
+      gender.innerText = "\u2014";
+    }
+
+    if (data.race == null) {
+      race.innerText = "\u2014";
+    } else {
+      race.innerText = data.race;
+    }
   });
 
   socket.on("message", async (data) => {
@@ -182,6 +213,11 @@
 
   like.addEventListener("click", (event) => {
     socket.emit("like", {});
+  });
+
+  analyze.addEventListener("click", (event) => {
+    context.recognize = true;
+    setTimeout(update, 500);
   });
 
   dislike.addEventListener("click", (event) => {

@@ -11,6 +11,8 @@ MODEL = "Facenet512"
 ACTIONS = ["age", "gender", "race"]
 
 Face = namedtuple("Face", ["index", "age", "confidence", "gender", "race"])
+AnalyzeResult = namedtuple("AnalyzeResult",
+                           ["probability", "age", "gender", "race"])
 
 
 def analyze_photo(image_id, path):
@@ -47,7 +49,7 @@ def analyze_photo(image_id, path):
 
     face = faces[face_index]
     face = Face(face_index, face["age"], face["face_confidence"],
-                face["dominant_gender"], face["dominant_race"])
+                face["dominant_gender"].lower(), face["dominant_race"])
     faces = DeepFace.represent(img_path=image,
                                enforce_detection=False,
                                model_name=MODEL,
@@ -63,6 +65,9 @@ def analyze_photo(image_id, path):
 
 def analyze_photos(model, photos, database):
     X = []
+    ages = []
+    genders = []
+    races = []
 
     for (index, (photo_id, _, path, _)) in enumerate(photos):
         embedding = database.select_photo_embedding(photo_id)
@@ -73,8 +78,9 @@ def analyze_photos(model, photos, database):
             if face is None:
                 continue
 
-            print(face)
-
+            ages.append(face.age)
+            genders.append(face.gender)
+            races.append(face.race)
             database.insert_photo_embedding(photo_id, pickle.dumps(embedding))
         else:
             embedding = pickle.loads(embedding)
@@ -88,4 +94,14 @@ def analyze_photos(model, photos, database):
     y = model.predict(X)
     m = np.median(y)
 
-    return float((np.exp(m) / (1 + np.exp(m))))
+    if len(ages) > 0 and len(genders) > 0 and len(races) > 0:
+        age = sorted(ages)[len(ages) // 2]
+        gender = sorted(genders)[len(genders) // 2]
+        race = sorted(races)[len(races) // 2]
+    else:
+        age = None
+        gender = None
+        race = None
+
+    return AnalyzeResult(float((np.exp(m) / (1 + np.exp(m)))), age, gender,
+                         race)
