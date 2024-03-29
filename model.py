@@ -13,7 +13,7 @@ class Model:
         self.model.add(layers.Dense(32, activation="leaky_relu"))
         self.model.add(layers.Dense(1))
         self.model.compile(
-            optimizer=keras.optimizers.RMSprop(),
+            optimizer=keras.optimizers.RMSprop(learning_rate=0.001),
             loss="binary_crossentropy",
             metrics=["accuracy"],
         )
@@ -25,7 +25,7 @@ class Model:
         self.model.save_weights(MODEL_PATH)
 
     def train(self, X, y):
-        self.model.fit(X, y, batch_size=64, epochs=50, validation_data=(X, y))
+        self.model.fit(X, y, batch_size=64, epochs=300, validation_data=(X, y))
 
     def predict(self, X):
         y = self.model.predict(X, batch_size=64)
