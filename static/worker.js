@@ -11,12 +11,12 @@
         <label for="probability">∀</label>
       </div>
 
-      <div class="row">
+      <div class="row description">
         Age: <span id="age">&mdash;</span>,
         Gender: <span id="gender">&mdash;</span>
       </div>
 
-      <div class="row">
+      <div class="row description">
         Race: <span id="race">&mdash;</span>
       </div>
 
@@ -31,7 +31,7 @@
         <button id="like" title="Like">⊕</button>
       </div>
 
-      <div class="row">
+      <div class="row description">
         <div id="message">&hellip;</message>
       </div>
   	`;
@@ -83,7 +83,7 @@
     if (found) {
       message.innerText = "auto skip";
 
-      setTimeout(update, 500);
+      setTimeout(update, 1000);
     } else if (wait) {
       message.innerText = "waiting...";
 
@@ -100,7 +100,7 @@
 
   socket.on("start", async () => {
     context.recognize = true;
-    setTimeout(update, 500);
+    setTimeout(update, 1000);
   });
 
   socket.on("set", async (data, callback) => {
@@ -217,7 +217,7 @@
 
   analyze.addEventListener("click", (event) => {
     context.recognize = true;
-    setTimeout(update, 500);
+    setTimeout(update, 1000);
   });
 
   dislike.addEventListener("click", (event) => {
