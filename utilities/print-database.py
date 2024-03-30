@@ -3,7 +3,9 @@ import sys
 import fire
 
 
-def start(database_path: str, show_embeddings: bool = False):
+def start(database_path: str,
+          statistics: bool = True,
+          embeddings: bool = False):
     connection = sqlite3.connect(database_path)
 
     print("-- statistics --")
@@ -24,29 +26,31 @@ def start(database_path: str, show_embeddings: bool = False):
     ).fetchall():
         print("N", mark, ":", count)
 
-    print()
-    print("-- profiles --")
+    if not statistics:
+        print()
+        print("-- profiles --")
 
-    for row in connection.execute("select * from profile").fetchall():
-        print(row)
+        for row in connection.execute("select * from profile").fetchall():
+            print(row)
 
-    print()
-    print("-- photos --")
+        print()
+        print("-- photos --")
 
-    for row in connection.execute("select * from photo").fetchall():
-        print(row)
+        for row in connection.execute("select * from photo").fetchall():
+            print(row)
 
-    print()
-    print("-- videos --")
+        print()
+        print("-- videos --")
 
-    for row in connection.execute("select * from video").fetchall():
-        print(row)
+        for row in connection.execute("select * from video").fetchall():
+            print(row)
 
-    if show_embeddings:
+    if embeddings:
         print()
         print("-- photo embeddings --")
 
-        for row in connection.execute("select * from photo_embedding").fetchall():
+        for row in connection.execute(
+                "select * from photo_embedding").fetchall():
             print(row)
 
 
