@@ -82,6 +82,7 @@ def handle_initialize(data):
         call("autoskip", { "value": "div[data-name=notice-featured-rating] button:not([data-name=featured-photos-text])" })
         call("autoskip", { "value": "button[data-name=close-action]" })
         call("autoskip", { "value": "a[data-name=close-action]" })
+        call("autoskip", { "value": "div[data-name=modal-dating-search] div:has(div > button) > a" })
         call("autowait", { "value": "div[data-name=uninotice-title-limit-voting]" })
         # yapf: enable
     elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
