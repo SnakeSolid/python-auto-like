@@ -1,8 +1,10 @@
 import sqlite3
 import sys
+import fire
 
-if __name__ == "__main__":
-    connection = sqlite3.connect(sys.argv[1])
+
+def start(database_path: str, show_embeddings: bool = False):
+    connection = sqlite3.connect(database_path)
 
     print("-- statistics --")
     print("N profiles:",
@@ -40,8 +42,13 @@ if __name__ == "__main__":
     for row in connection.execute("select * from video").fetchall():
         print(row)
 
-    print()
-    print("-- photo embeddings --")
+    if show_embeddings:
+        print()
+        print("-- photo embeddings --")
 
-    for row in connection.execute("select * from photo_embedding").fetchall():
-        print(row)
+        for row in connection.execute("select * from photo_embedding").fetchall():
+            print(row)
+
+
+if __name__ == "__main__":
+    fire.Fire(start)

@@ -3,3 +3,4 @@ Flask
 Flask-SocketIO
 tensorflow==2.12.1
 yapf
+fire
