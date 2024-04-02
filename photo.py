@@ -88,7 +88,7 @@ def analyze_photos(model, photos, database):
         X.append(embedding)
 
     if len(X) == 0:
-        return 0.0
+        return AnalyzeResult(0.5, None, None, None)
 
     X = np.array(X)
     y = model.predict(X)
