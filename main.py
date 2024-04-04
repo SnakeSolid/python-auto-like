@@ -86,6 +86,8 @@ def handle_initialize(data):
         call("set", { "name": "name", "value": "div:has(> div[data-name=voting-photo]) div[data-name=item-title-name]" })
         call("set", { "name": "age", "value": "div:has(> div[data-name=voting-photo]) span[data-name=item-title-age]" })
         call("set", { "name": "description", "value": "div:has(> div[data-name=voting-photo]) > div > div:has(div[data-name=item-title-name])" })
+        call("set", { "name": "prev", "value": "div[data-name=voting-photo] div[data-name=arrow-left]" })
+        call("set", { "name": "next", "value": "div[data-name=voting-photo] div[data-name=arrow-right]" })
         call("set", { "name": "photo", "value": "div[data-name=voting-photo] > img" })
         call("set", { "name": "like", "value": "div[data-name=voting-photo] button[data-name=like-action]" })
         call("set", { "name": "dislike", "value": "div[data-name=voting-photo] button[data-name=dislike-action]" })
