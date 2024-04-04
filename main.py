@@ -187,9 +187,13 @@ def handle_recognize(data):
 
     if result.manual:
         if result.probability > 0.5:
+            call("click", {"name": "like"})
             emit("message", {"message": "manual like"})
         else:
+            call("click", {"name": "dislike"})
             emit("message", {"message": "manual dislike"})
+
+        emit("start", {})
     else:
         emit("message", {"message": "done"})
 
