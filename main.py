@@ -98,16 +98,18 @@ def handle_initialize(data):
         "div[data-name=modal-dating-search] div > a"
         call("autowait", { "value": "div[data-name=uninotice-title-limit-voting]" })
         # yapf: enable
-    elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
+    elif domain == "prod-app7058363-cb81f101f05d.pages-ac.vk-apps.com":  # VK Dating
         # yapf: disable
-        call("set", { "name": "name", "value": "div.UserFullInfo__main-header-name > div > span:nth-child(1)" })
-        call("set", { "name": "age", "value": "div.UserFullInfo__main-header-name > div > span:nth-child(2)" })
-        call("set", { "name": "description", "value": "div.UserFullInfo.UserFullInfo--vkcom" })
+        call("set", { "name": "name", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > div > div > span:nth-child(1)" })
+        call("set", { "name": "age", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > div > div > span:nth-child(2)" })
+        call("set", { "name": "description", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none > div > div:has(section)" })
         call("set", { "name": "photos", "value": "div[data-testid=current-card] div > img" })
         call("set", { "name": "videos", "value": "div[data-testid=current-card] div > video > source" })
         call("set", { "name": "like", "value": "div[data-testid=current-card] div[role=button][data-testid=like]" })
         call("set", { "name": "dislike", "value": "div[data-testid=current-card] div[role=button][data-testid=dislike]" })
         call("autoskip", { "value": "div.CustomCardDesktopAside div.vkuiPlaceholder__action button.vkuiButton.vkuiButton--mode-tertiary" })
+        call("autoskip", { "value": "div.vkuiPlaceholder button.vkuiButton.vkuiButton--mode-tertiary" })
+        call("autoskip", { "value": "#match button.vkuiButton.vkuiButton--mode-secondary" })
         call("autowait", { "value": "div.GetProductAbstractPanelDesktop" })
         # yapf: enable
     elif domain == "teamo.date":
@@ -152,7 +154,7 @@ def handle_recognize(data):
                 break
 
         profile = Profile(domain, name, age, description, photos)
-    elif domain == "prod-app7058363-5845152417b7.pages-ac.vk-apps.com":  # VK Dating
+    elif domain == "prod-app7058363-cb81f101f05d.pages-ac.vk-apps.com":  # VK Dating
         photos = [
             uri for uri in call("attributes", {
                 "name": "photos",
@@ -170,6 +172,11 @@ def handle_recognize(data):
         photos = call("attributes", {"name": "photos", "attribute": "src"})
         profile = Profile(domain, to_text(name), age, description, photos)
 
+    print("Name:", profile.name)
+    print("Age:", profile.age)
+    print("Description:", profile.description.replace("\n", " "))
+
+    context[request.sid] = None
     profile_id = database.save_profile(profile)
     context[request.sid] = profile_id
 
