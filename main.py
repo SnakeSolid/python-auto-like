@@ -100,8 +100,8 @@ def handle_initialize(data):
         # yapf: enable
     elif domain == "prod-app7058363-36ce59447d49.pages-ac.vk-apps.com":  # VK Dating
         # yapf: disable
-        call("set", { "name": "name", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > div > div > span:nth-child(1)" })
-        call("set", { "name": "age", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > div > div > span:nth-child(2)" })
+        call("set", { "name": "name", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > span > div > :nth-child(1)" })
+        call("set", { "name": "age", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > span > div > :nth-child(2)" })
         call("set", { "name": "description", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none > div > div:has(section)" })
         call("set", { "name": "photos", "value": "div[data-testid=current-card] div > img" })
         call("set", { "name": "videos", "value": "div[data-testid=current-card] div > video > source" })
@@ -178,11 +178,15 @@ def handle_recognize(data):
 
     context[request.sid] = None
     profile_id = database.save_profile(profile)
-    context[request.sid] = profile_id
+    context[request.sid] = {"profile": profile_id}
 
     emit("message", {"message": "analyzing..."})
 
     result = analyze(profile_id)
+    context[request.sid]["probability"] = result.probability
+    context[request.sid]["age"] = result.age
+    context[request.sid]["gender"] = result.gender
+    context[request.sid]["race"] = result.race
 
     emit(
         "prediction", {
@@ -208,7 +212,7 @@ def handle_recognize(data):
 @socketio.on("like")
 def handle_like(data):
     if request.sid in context:
-        profile_id = context[request.sid]
+        profile_id = context[request.sid]["profile"]
         database.set_like(profile_id)
 
         call("click", {"name": "like"})
@@ -219,11 +223,30 @@ def handle_like(data):
 @socketio.on("dislike")
 def handle_dislike(data):
     if request.sid in context:
-        profile_id = context[request.sid]
+        profile_id = context[request.sid]["profile"]
         database.set_dislike(profile_id)
 
         call("click", {"name": "dislike"})
         emit("message", {"message": "dislike"})
+        emit("start", {})
+
+
+@socketio.on("autolike")
+def handle_autolike(data):
+    if request.sid in context:
+        # Implement your own autolike rules here.
+        probability = context[request.sid]["probability"]
+        age = context[request.sid]["age"]
+        gender = context[request.sid]["gender"]
+        race = context[request.sid]["race"]
+
+        if probability > 0.5:
+            call("click", {"name": "like"})
+            emit("message", {"message": "like"})
+        else:
+            call("click", {"name": "dislike"})
+            emit("message", {"message": "dislike"})
+
         emit("start", {})
 
 

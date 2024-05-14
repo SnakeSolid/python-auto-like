@@ -205,6 +205,10 @@
     } else {
       race.innerText = data.race;
     }
+
+    if (autolike.checked) {
+      socket.emit("autolike", {});
+    }
   });
 
   socket.on("message", async (data) => {
