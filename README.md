@@ -2,6 +2,8 @@
 
 Automatic like for dating sites.
 
+![Auto like](images/auto-like.png "Auto like")
+
 ## Run
 
 To `auto-like` with basic settings use following command:
