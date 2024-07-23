@@ -23,11 +23,18 @@ def analyze_photo(image_id, path):
         return (None, None)
 
     image_height, image_width = image.shape[0], image.shape[1]
-    faces = DeepFace.analyze(img_path=image,
-                             enforce_detection=False,
-                             actions=ACTIONS,
-                             detector_backend=BACKEND,
-                             silent=True)
+
+    try:
+        faces = DeepFace.analyze(img_path=image,
+                                 enforce_detection=False,
+                                 actions=ACTIONS,
+                                 detector_backend=BACKEND,
+                                 silent=True)
+    except cv2.error as e:
+        print("Failed to analyze image {}: {}".format(path, e))
+
+        return (None, None)
+
     face = [face for face in faces if face["face_confidence"] > 0]
     n_faces = len(faces)
 
@@ -50,10 +57,16 @@ def analyze_photo(image_id, path):
     face = faces[face_index]
     face = Face(face_index, face["age"], face["face_confidence"],
                 face["dominant_gender"].lower(), face["dominant_race"])
-    faces = DeepFace.represent(img_path=image,
-                               enforce_detection=False,
-                               model_name=MODEL,
-                               detector_backend=BACKEND)
+
+    try:
+        faces = DeepFace.represent(img_path=image,
+                                   enforce_detection=False,
+                                   model_name=MODEL,
+                                   detector_backend=BACKEND)
+    except cv2.error as e:
+        print("Failed to represent image {}: {}".format(path, e))
+
+        return (None, None)
 
     if len(faces) <= face_index:
         return (None, None)
