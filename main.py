@@ -98,7 +98,7 @@ def handle_initialize(data):
         "div[data-name=modal-dating-search] div > a"
         call("autowait", { "value": "div[data-name=uninotice-title-limit-voting]" })
         # yapf: enable
-    elif domain == "prod-app7058363-96e55d067764.pages-ac.vk-apps.com":  # VK Dating
+    elif domain == "prod-app7058363-358dbdd4153a.pages-ac.vk-apps.com":  # VK Dating
         # yapf: disable
         call("set", { "name": "name", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > span > div > :nth-child(1)" })
         call("set", { "name": "age", "value": "div.vkuiCustomScrollView.vkuiCustomScrollView--hasPointer-none span.vkuiHeader__content-in > div > span > div > :nth-child(2)" })
@@ -154,7 +154,7 @@ def handle_recognize(data):
                 break
 
         profile = Profile(domain, name, age, description, photos)
-    elif domain == "prod-app7058363-96e55d067764.pages-ac.vk-apps.com":  # VK Dating
+    elif domain == "prod-app7058363-358dbdd4153a.pages-ac.vk-apps.com":  # VK Dating
         photos = [
             uri for uri in call("attributes", {
                 "name": "photos",
